@@ -1,16 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useDispatch } from 'react-redux';
 import s from './ContactList.module.css';
-import * as operations from 'redux/contacts/contacts-operations';
 import { Notify } from 'notiflix';
+import { useDeleteContactMutation } from 'redux/contacts/contacts';
 
 const ContactList = ({ contacts }) => {
-  const dispatch = useDispatch();
-
-  const removeContact = id => {
-    dispatch(operations.removeContact(id));
-  };
+  const [deleteContact] = useDeleteContactMutation();
 
   return (
     <ul className={s.contactList}>
@@ -27,7 +22,7 @@ const ContactList = ({ contacts }) => {
               type="button"
               onClick={() => {
                 Notify.info(`${el.name} was deleted from contacts`);
-                dispatch(() => removeContact(el.id));
+                deleteContact(el.id);
               }}
             >
               Delete
@@ -42,5 +37,5 @@ const ContactList = ({ contacts }) => {
 export default ContactList;
 
 ContactList.propTypes = {
-  contacts: PropTypes.array.isRequired,
+  contacts: PropTypes.array,
 };

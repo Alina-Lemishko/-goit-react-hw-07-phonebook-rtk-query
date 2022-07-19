@@ -1,18 +1,13 @@
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
 import { nanoid } from 'nanoid';
-import * as operations from '../../redux/contacts/contacts-operations';
 import s from './ContactForm.module.css';
+import { useAddContactsMutation } from 'redux/contacts/contacts';
+import { Notify } from 'notiflix';
 
-export default function ContactForm() {
+export default function ContactForm({ contacts }) {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
-
-  const addContact = data => {
-    dispatch(operations.addContact(data));
-  };
-
-  const dispatch = useDispatch();
+  const [addContacts] = useAddContactsMutation();
 
   const handleReset = () => {
     setName('');
@@ -22,7 +17,13 @@ export default function ContactForm() {
   const handleSubmit = e => {
     e.preventDefault();
 
-    addContact({ name, phone, id: nanoid() });
+    const duplicate = contacts.some(contact => contact.name === name);
+    if (duplicate) {
+      Notify.failure(`${name} is already in contacts`);
+      return;
+    }
+    addContacts({ name, phone, id: nanoid() });
+    Notify.success(`${name} was added in contacts`);
 
     handleReset();
   };

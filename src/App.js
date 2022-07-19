@@ -1,55 +1,38 @@
-import { useDispatch, useSelector } from 'react-redux';
-import { useState, useEffect, useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import ContactForm from 'components/ContactForm/ContactForm';
 import Filter from 'components/Filter/Filter';
 import ContactList from 'components/ContactList/ContactList';
-import {
-  contactSelector,
-  getError,
-  getLoading,
-} from 'redux/contacts/contacts-selectors';
-import * as operations from './redux/contacts/contacts-operations';
 import Loader from 'components/Loader/loader';
 import s from './App.module.css';
+import { useGetContactsQuery } from 'redux/contacts/contacts';
 
 export default function App() {
   const [filter, setFilter] = useState('');
-
-  const contacts = useSelector(contactSelector);
-  const loading = useSelector(getLoading);
-  const error = useSelector(getError);
-
-  const dispatch = useDispatch();
-
-  useEffect(
-    () => {
-      dispatch(operations.fetchContacts());
-    },
-    // eslint-disable-next-line
-    []
-  );
+  const { data, error, isFetching: loading } = useGetContactsQuery();
 
   const getFilteredContacts = useMemo(() => {
     const normalizedFilter = filter?.toLowerCase();
     if (filter) {
-      return contacts?.filter(({ name }) =>
+      return data?.filter(({ name }) =>
         name.toLowerCase().includes(normalizedFilter)
       );
     }
-    return contacts;
-  }, [contacts, filter]);
+    return data;
+  }, [data, filter]);
 
   return (
     <div className={s.container}>
       <h1 className={s.title}>Phonebook</h1>
-      <ContactForm />
+      <ContactForm contacts={data} />
       <h2 className={s.contactsTitle}>Contacts</h2>
       <Filter filter={filter} setFilter={setFilter} />
       {loading && <Loader />}
       {error && <p>{error.message}</p>}
-      {Boolean(getFilteredContacts.length) && (
+      {
+        /* {Boolean(getFilteredContacts.length) && ( */
         <ContactList contacts={getFilteredContacts} />
-      )}
+        /*   )} */
+      }
     </div>
   );
 }
