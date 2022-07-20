@@ -2,14 +2,23 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import s from './ContactList.module.css';
 import { Notify } from 'notiflix';
-import { useDeleteContactMutation } from 'redux/contacts/contacts';
+import {
+  useDeleteContactMutation,
+  useGetContactsQuery,
+} from 'redux/contacts/contacts';
+import { useSelector } from 'react-redux';
+import { getVisibleContacts } from 'redux/filter/filter-selectors';
 
-const ContactList = ({ contacts }) => {
+const ContactList = () => {
   const [deleteContact] = useDeleteContactMutation();
+  const { data: contacts } = useGetContactsQuery();
+  const filteredContacts = useSelector(state =>
+    getVisibleContacts(contacts, state)
+  );
 
   return (
     <ul className={s.contactList}>
-      {contacts?.map(el => {
+      {filteredContacts?.map(el => {
         return (
           <li
             className={s.contactListItem}

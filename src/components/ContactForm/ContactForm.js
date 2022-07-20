@@ -1,13 +1,17 @@
 import { useState } from 'react';
 import { nanoid } from 'nanoid';
 import s from './ContactForm.module.css';
-import { useAddContactsMutation } from 'redux/contacts/contacts';
+import {
+  useAddContactsMutation,
+  useGetContactsQuery,
+} from 'redux/contacts/contacts';
 import { Notify } from 'notiflix';
 
-export default function ContactForm({ contacts }) {
+export default function ContactForm() {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [addContacts] = useAddContactsMutation();
+  const { data: contacts } = useGetContactsQuery();
 
   const handleReset = () => {
     setName('');
